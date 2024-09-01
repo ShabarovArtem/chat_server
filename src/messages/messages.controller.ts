@@ -4,40 +4,22 @@ import { Create_messageDto } from './dto/create_message.dto';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(private readonly messagesService: MessagesService) {
+  }
 
   @Post('add')
-  async addMessage(@Body() createMessageDto: Create_messageDto) {
-    try {
-      const message = await this.messagesService.createMessage(createMessageDto);
-      return { id: message.id };
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'Could not create message',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async createMessage(@Body() createMessageDto: Create_messageDto) {
+    return await this.messagesService.createMessage(createMessageDto);
   }
+
 
   @Post('get')
   async getMessages(@Body() body: { chat: number }) {
-    try {
-      const messages = await this.messagesService.getMessagesByChat(body.chat);
-      return messages;
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'Could not retrieve messages',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const messages = await this.messagesService.getMessagesByChat(body.chat);
+    return messages;
   }
 }
+
 
 
 

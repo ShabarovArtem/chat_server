@@ -13,6 +13,6 @@ import { Message } from './messages.model';
   ],
   controllers: [MessagesController],
   providers: [MessagesService],
-  exports: [SequelizeModule], // Экспортируем для использования в других модулях
+  exports: [SequelizeModule],
 })
 export class MessagesModule {}

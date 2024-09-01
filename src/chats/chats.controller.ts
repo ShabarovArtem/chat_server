@@ -7,14 +7,12 @@ import { Get_ChatDto } from './dto/get_chat.dto';
 export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}
 
-  // Создание чата
   @Post('add')
   async createChat(@Body() dto: Create_chatDto) {
     const chat = await this.chatsService.createChat(dto);
     return { id: chat.id };
   }
 
-  // Получение чатов пользователя
   @Post('get')
   async getChatsByUser(@Body() dto: Get_ChatDto) {
     const chats = await this.chatsService.getChatsByUser(dto.user);

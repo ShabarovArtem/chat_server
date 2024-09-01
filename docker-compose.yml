@@ -1,32 +1,27 @@
 version: '3.8'
 
 services:
-  main:
-    container_name: main
-    build:
-      context: .
-    env_file:
-      - .development.env
-    volumes:
-      - .:/app
-      - /app/node_modules
+  api:
+    build: .
+    restart: always
+    hostname: api
+    environment:
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASS: root
+      DB_HOST: postgres
     ports:
-      - 9000:9000  # Пробрасываем порт 9000 из контейнера на 9000 хост-машины
-    command: npm run start:dev
+      - "9000:9000"
     depends_on:
       - postgres
-    restart: always
+
   postgres:
-    container_name: postgres
-    image: postgres:12
-    env_file:
-      - .development.env
+    hostname: postgres
+    image: postgres:14
     environment:
-      POSTGRES_DB: chat_server
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 21192126
-    ports:
-      - 5432:5432
+      PG_DATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
