@@ -8,11 +8,11 @@ export class Message extends Model<Message> {
   id: number;
 
   @ForeignKey(() => Chat)
-  @Column({type: DataType.INTEGER, allowNull: false, field: 'chat'}) // Настройка для поля chat
+  @Column({type: DataType.INTEGER, allowNull: false, field: 'chat'})
   chatId: number;
 
   @ForeignKey(() => User)
-  @Column({type: DataType.INTEGER, allowNull: false, field: 'author'}) // Настройка для поля author
+  @Column({type: DataType.INTEGER, allowNull: false, field: 'author'})
   authorId: number;
 
   @Column({type: DataType.STRING, allowNull: false})

@@ -55,7 +55,7 @@ export class MessagesService {
 
     const messages = await this.messageRepository.findAll({
       where: { chatId },
-      order: [['createdAt', 'ASC']], // Сортировка по времени создания (от раннего к позднему)
+      order: [['createdAt', 'ASC']],
     });
 
     if (messages.length === 0) {

@@ -13,16 +13,16 @@ import { Message } from './messages/messages.model';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.${process.env.NODE_ENV}.env`
+      envFilePath: '.env'
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_HOST),
-      username: process.env.DB_USER,
+      host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT) || 5432,
+      username: process.env.DB_USER || 'root',
       password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      models: [User,Chat, UserChats, Message],
+      database: process.env.DB_NAME || 'postgres',
+      models: [User, Chat, UserChats, Message],
       autoLoadModels: true,
       synchronize: true
     }),
@@ -34,4 +34,3 @@ import { Message } from './messages/messages.model';
   providers: [],
 })
 export class AppModule {}
-

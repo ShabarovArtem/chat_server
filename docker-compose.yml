@@ -6,9 +6,9 @@ services:
     restart: always
     hostname: api
     environment:
-      DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASS: root
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
       DB_HOST: postgres
     ports:
       - "9000:9000"
@@ -19,14 +19,16 @@ services:
     hostname: postgres
     image: postgres:14
     environment:
-      PG_DATA: /var/lib/postgresql/data
-      POSTGRES_PASSWORD: root
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
 
 volumes:
   pgdata:
+
+
 
 

@@ -1,17 +1,21 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Chat } from './chats.model';
 import { UserChats } from './user_chats.model';
 import { Create_chatDto } from './dto/create_chat.dto';
 import { Message } from '../messages/messages.model';
 import { User } from '../users/users.model';
+import { Sequelize } from 'sequelize';
+import { isEqual } from 'lodash';
+
 
 @Injectable()
 export class ChatsService {
   constructor(
     @InjectModel(Chat) private readonly chatRepository: typeof Chat,
     @InjectModel(UserChats) private readonly userChatsRepository: typeof UserChats,
-    @InjectModel(User) private readonly userRepository: typeof User, // Добавляем модель User
+    @InjectModel(User) private readonly userRepository: typeof User,
+    @InjectConnection() private readonly sequelize: Sequelize
   ) {}
 
   async createChat(dto: Create_chatDto): Promise<Chat> {
@@ -35,7 +39,7 @@ export class ChatsService {
       const chatUserIds = chat.users.map(user => user.id).sort();
       const dtoUserIds = dto.users.sort();
 
-      if (JSON.stringify(chatUserIds) === JSON.stringify(dtoUserIds)) {
+      if (isEqual(chatUserIds, dtoUserIds)) {
         throw new ConflictException('Chat with this name and users already exists');
       }
     }
@@ -78,22 +82,19 @@ export class ChatsService {
           required: false,
         },
       ],
-    });
-
-    chats.sort((a, b) => {
-      const latestMessageA = a.messages?.reduce((latest, msg) =>
-          msg.createdAt > latest.createdAt ? msg : latest,
-        a.messages?.[0]
-      );
-      const latestMessageB = b.messages?.reduce((latest, msg) =>
-          msg.createdAt > latest.createdAt ? msg : latest,
-        b.messages?.[0]
-      );
-
-      return (latestMessageB?.createdAt ?? new Date(0)).getTime() - (latestMessageA?.createdAt ?? new Date(0)).getTime();
+      order: [
+        [
+          this.sequelize.literal(
+            `(SELECT MAX("messages"."createdAt") FROM "messages" WHERE "messages"."chat" = "Chat"."id")`
+          ),
+          'DESC',
+        ],
+      ],
     });
 
     return chats;
   }
 }
+
+
 
