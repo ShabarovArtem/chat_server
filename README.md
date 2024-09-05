@@ -15,7 +15,7 @@ npm install
 Настройки БД и прочее находятся в .env
 
 ```
-npm run start:dev
+npm start
 ```
 Выполнение миграций 
 
@@ -27,9 +27,4 @@ npm run migrate:dev
 
 ```
 docker-compose up -d
-```
-Выполнение миграций
-
-```
-docker-compose exec api npx sequelize-cli db:migrate
 ```
