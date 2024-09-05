@@ -1,10 +1,15 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Message } from './messages.model';
+import { Message } from '../models/messages.model';
 import { Create_messageDto } from './dto/create_message.dto';
-import { Chat } from '../chats/chats.model';
-import { User } from '../users/users.model';
-import { UserChats } from '../chats/user_chats.model';
+import { Chat } from '../models/chats.model';
+import { User } from '../models/users.model';
+import { UserChats } from '../models/user_chats.model';
+import { Get_messageDto } from './dto/get_message';
 
 @Injectable()
 export class MessagesService {
@@ -12,7 +17,8 @@ export class MessagesService {
     @InjectModel(Message) private readonly messageRepository: typeof Message,
     @InjectModel(Chat) private readonly chatRepository: typeof Chat,
     @InjectModel(User) private readonly userRepository: typeof User,
-    @InjectModel(UserChats) private readonly userChatsRepository: typeof UserChats,
+    @InjectModel(UserChats)
+    private readonly userChatsRepository: typeof UserChats,
   ) {}
 
   async createMessage(dto: Create_messageDto): Promise<Message> {
@@ -34,7 +40,9 @@ export class MessagesService {
     });
 
     if (!userInChat) {
-      console.log(`User with ID ${dto.author} is not a member of chat ${dto.chat}`);
+      console.log(
+        `User with ID ${dto.author} is not a member of chat ${dto.chat}`,
+      );
       throw new ForbiddenException('User is not a member of the chat');
     }
 
@@ -47,14 +55,16 @@ export class MessagesService {
     return message;
   }
 
-  async getMessagesByChat(chatId: number): Promise<Message[]> {
-    const chat = await this.chatRepository.findByPk(chatId);
+  async getMessagesByChat(dto: Get_messageDto): Promise<Message[]> {
+    const chat = await this.chatRepository.findByPk(dto.chat);
     if (!chat) {
       throw new NotFoundException('Chat not found');
     }
 
     const messages = await this.messageRepository.findAll({
-      where: { chatId },
+      where: {
+        chatId: chat.id,
+      },
       order: [['createdAt', 'ASC']],
     });
 

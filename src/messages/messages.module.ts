@@ -2,15 +2,13 @@ import { Module } from '@nestjs/common';
 import { MessagesController } from './messages.controller';
 import { MessagesService } from './messages.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from '../users/users.model';
-import { Chat } from '../chats/chats.model';
-import { UserChats } from '../chats/user_chats.model';
-import { Message } from './messages.model';
+import { User } from '../models/users.model';
+import { Chat } from '../models/chats.model';
+import { UserChats } from '../models/user_chats.model';
+import { Message } from '../models/messages.model';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Message, Chat, User, UserChats]),
-  ],
+  imports: [SequelizeModule.forFeature([Message, Chat, User, UserChats])],
   controllers: [MessagesController],
   providers: [MessagesService],
   exports: [SequelizeModule],

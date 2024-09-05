@@ -9,7 +9,8 @@ ENV API_HOST="0.0.0.0"
 ENV API_PORT=9000
 
 COPY src/ src/
-
+COPY config/ config/
+COPY migrations/ migrations/
 COPY package.json tsconfig.json ./
 
 RUN npm install

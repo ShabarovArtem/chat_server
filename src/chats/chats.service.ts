@@ -1,21 +1,25 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
-import { Chat } from './chats.model';
-import { UserChats } from './user_chats.model';
+import { Chat } from '../models/chats.model';
+import { UserChats } from '../models/user_chats.model';
 import { Create_chatDto } from './dto/create_chat.dto';
-import { Message } from '../messages/messages.model';
-import { User } from '../users/users.model';
+import { Message } from '../models/messages.model';
+import { User } from '../models/users.model';
 import { Sequelize } from 'sequelize';
 import { isEqual } from 'lodash';
-
 
 @Injectable()
 export class ChatsService {
   constructor(
     @InjectModel(Chat) private readonly chatRepository: typeof Chat,
-    @InjectModel(UserChats) private readonly userChatsRepository: typeof UserChats,
+    @InjectModel(UserChats)
+    private readonly userChatsRepository: typeof UserChats,
     @InjectModel(User) private readonly userRepository: typeof User,
-    @InjectConnection() private readonly sequelize: Sequelize
+    @InjectConnection() private readonly sequelize: Sequelize,
   ) {}
 
   async createChat(dto: Create_chatDto): Promise<Chat> {
@@ -29,24 +33,28 @@ export class ChatsService {
 
     const existingChats = await this.chatRepository.findAll({
       where: { name: dto.name },
-      include: [{
-        model: User,
-        through: { attributes: [] },
-      }],
+      include: [
+        {
+          model: User,
+          through: { attributes: [] },
+        },
+      ],
     });
 
     for (const chat of existingChats) {
-      const chatUserIds = chat.users.map(user => user.id).sort();
+      const chatUserIds = chat.users.map((user) => user.id).sort();
       const dtoUserIds = dto.users.sort();
 
       if (isEqual(chatUserIds, dtoUserIds)) {
-        throw new ConflictException('Chat with this name and users already exists');
+        throw new ConflictException(
+          'Chat with this name and users already exists',
+        );
       }
     }
 
     const chat = await this.chatRepository.create({ name: dto.name });
 
-    const userChats = dto.users.map(userId => ({
+    const userChats = dto.users.map((userId) => ({
       chatId: chat.id,
       userId,
     }));
@@ -70,7 +78,7 @@ export class ChatsService {
       throw new NotFoundException('This user has no chats');
     }
 
-    const chatIds = userChats.map(userChat => userChat.chatId);
+    const chatIds = userChats.map((userChat) => userChat.chatId);
 
     const chats = await this.chatRepository.findAll({
       where: {
@@ -85,7 +93,7 @@ export class ChatsService {
       order: [
         [
           this.sequelize.literal(
-            `(SELECT MAX("messages"."createdAt") FROM "messages" WHERE "messages"."chat" = "Chat"."id")`
+            `(SELECT MAX("messages"."createdAt") FROM "messages" WHERE "messages"."chat" = "Chat"."id")`,
           ),
           'DESC',
         ],
@@ -95,6 +103,3 @@ export class ChatsService {
     return chats;
   }
 }
-
-
-

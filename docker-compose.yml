@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   api:
@@ -11,9 +11,11 @@ services:
       DB_PASS: ${DB_PASS}
       DB_HOST: postgres
     ports:
-      - "9000:9000"
+      - '9000:9000'
     depends_on:
       - postgres
+    env_file:
+      - .env
 
   postgres:
     hostname: postgres
@@ -25,10 +27,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
+    env_file:
+      - .env
 
 volumes:
   pgdata:
-
-
-
-
